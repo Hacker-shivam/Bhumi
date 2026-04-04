@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-    origin: "https://bhumi-omega.vercel.app.com",
+    origin: "https://bhumi-omega.vercel.app",
     credentials: true
 }));
 app.use(express.json());
