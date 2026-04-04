@@ -2,49 +2,91 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pickle
 import numpy as np
+import os
+import pandas as pd
 
 app = Flask(__name__)
-CORS(app) # Allows your Express server to talk to Flask [cite: 79]
+CORS(app)
 
-# Load models (Assuming you have trained and saved them as .pkl files) [cite: 48, 149]
+# ✅ Get base directory (important for Render)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ✅ Load models safely
+crop_model = None
+fert_model = None
+
 try:
-    crop_model = pickle.load(open('models/crop_recommendation.pkl', 'rb'))
-    fert_model = pickle.load(open('models/fertilizer_recommendation.pkl', 'rb'))
-except FileNotFoundError:
-    print("Warning: Model files not found. Please run training script first.")
+    crop_model = pickle.load(open(os.path.join(BASE_DIR, 'models/crop_recommendation.pkl'), 'rb'))
+    fert_model = pickle.load(open(os.path.join(BASE_DIR, 'models/fertilizer_recommendation.pkl'), 'rb'))
+    print("✅ Models loaded successfully")
+except Exception as e:
+    print("❌ Model loading error:", e)
 
+
+# ✅ Home Route (important for Render health check)
+@app.route("/")
+def home():
+    return "Bhumi ML API is running 🚀"
+
+
+# ✅ Crop Prediction API
 @app.route('/predict-crop', methods=['POST'])
 def predict_crop():
-    """
-    Inputs: N, P, K, temperature, humidity, pH, rainfall [cite: 96, 214]
-    """
-    data = request.get_json()
-    
-    # Extract features in the correct order for the model [cite: 48]
-    features = np.array([[
-        data['nitrogen'], data['phosphorus'], data['potassium'],
-        data['temperature'], data['humidity'], data['pH'], data['rainfall']
-    ]])
-    
-    prediction = crop_model.predict(features)
-    return jsonify({'recommended_crop': prediction[0]})
+    if crop_model is None:
+        return jsonify({"error": "Crop model not loaded"}), 500
 
+    try:
+        data = request.get_json()
+
+        features = np.array([[
+            float(data['nitrogen']),
+            float(data['phosphorus']),
+            float(data['potassium']),
+            float(data['temperature']),
+            float(data['humidity']),
+            float(data['pH']),
+            float(data['rainfall'])
+        ]])
+
+        prediction = crop_model.predict(features)
+
+        return jsonify({
+            'recommended_crop': str(prediction[0])
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
+# ✅ Fertilizer Prediction API
 @app.route('/predict-fertilizer', methods=['POST'])
 def predict_fertilizer():
-    """
-    Inputs: Soil Type, Crop Type, N, P, K, etc. [cite: 107, 219]
-    """
-    data = request.get_json()
-    
-    # Features must match your training data columns [cite: 48]
-    features = np.array([[
-        data['temp'], data['humidity'], data['moisture'], 
-        data['soil_type'], data['crop_type'], 
-        data['nitrogen'], data['potassium'], data['phosphorus']
-    ]])
-    
-    prediction = fert_model.predict(features)
-    return jsonify({'recommended_fertilizer': prediction[0]})
+    if fert_model is None:
+        return jsonify({"error": "Fertilizer model not loaded"}), 500
+
+    try:
+        data = request.get_json()
+
+        features = pd.DataFrame([{
+    'N': float(data['nitrogen']),
+    'P': float(data['phosphorus']),
+    'K': float(data['potassium']),
+    'temperature': float(data['temperature']),
+    'humidity': float(data['humidity']),
+    'ph': float(data['pH']),
+    'rainfall': float(data['rainfall'])
+   }])
+
+        prediction = fert_model.predict(features)
+
+        return jsonify({
+            'recommended_fertilizer': str(prediction[0])
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)

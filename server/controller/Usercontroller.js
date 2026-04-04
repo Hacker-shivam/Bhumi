@@ -47,7 +47,7 @@ export const Signup = async (req, res) => {
 
 
 export const Login = async (req, res) => {
-    const SECRET_KEY = "shivam";
+    const SECRET_KEY = process.env.JWT_SECRET;
     try {
 
         const { email, password } = req.body;
