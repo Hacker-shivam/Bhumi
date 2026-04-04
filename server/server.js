@@ -4,6 +4,7 @@ import UserRoute from "./routes/UserRoute.js";
 import cors from 'cors';
 import cropRoutes from "./routes/Crop.js";
 import cropRouter from './routes/Crop.js';
+import connectDB from './config/db.js';
 
 
 dotenv.config();
@@ -16,6 +17,10 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended : true} ))
+
+
+
+connectDB();
 
 app.use('/api/', UserRoute)
 
