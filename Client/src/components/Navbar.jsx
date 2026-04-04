@@ -32,12 +32,10 @@ const Navbar = () => {
           {/* Desktop Links */}
           <div className="hidden md:flex flex-1 justify-center">
             <ul className='flex gap-8 text-white font-medium'>
-              <li><Link to="/">Home</Link></li>
-              <li><Link to="/crop">Crop</Link></li>
-              <li><Link to="/fertilizer">Fertilizer</Link></li>
-              <li><Link to="/weather">Weather</Link></li>
-              <li><Link to="/recommendation">Recommendation</Link></li>
-              <li><Link to="/about">About</Link></li>
+              <li><Link to="/">HOME</Link></li>
+              <li><Link to="/service">SERVICES</Link></li>
+              <li><Link to="/recommendation">BHUMI AI</Link></li>
+              <li><Link to="/about">ABOUT</Link></li>
             </ul>
           </div>
 

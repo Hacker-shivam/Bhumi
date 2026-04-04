@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Weather from "./pages/Weather";
 import About from "./pages/About";
 import CropAdvisor from "./pages/CropAdvisor";
+import Services from "./pages/Services";
 
 const App = () => {
   return (
@@ -70,6 +71,15 @@ const App = () => {
           element={
             <ProtectedRoute>
               <CropAdvisor />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/service"
+          element={
+            <ProtectedRoute>
+              <Services />
             </ProtectedRoute>
           }
         />

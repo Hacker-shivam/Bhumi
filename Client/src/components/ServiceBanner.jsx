@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
   {
@@ -23,10 +24,9 @@ const images = [
   },
 ];
 
-const FlipkartBanner = () => {
+const ServiceBanner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-
   const touchStartX = useRef(0);
   const touchEndX = useRef(0);
 
@@ -35,7 +35,7 @@ const FlipkartBanner = () => {
     if (isPaused) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
+    }, 4500);
     return () => clearInterval(interval);
   }, [isPaused]);
 
@@ -44,72 +44,92 @@ const FlipkartBanner = () => {
   const handleTouchMove = (e) => (touchEndX.current = e.touches[0].clientX);
   const handleTouchEnd = () => {
     const diff = touchStartX.current - touchEndX.current;
-    if (diff > 50) setCurrentIndex((prev) => (prev + 1) % images.length); // swipe left
-    if (diff < -50) setCurrentIndex((prev) => (prev - 1 + images.length) % images.length); // swipe right
+    if (diff > 50) setCurrentIndex((prev) => (prev + 1) % images.length);
+    if (diff < -50) setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full overflow-hidden px-4 sm:px-8 md:px-16 lg:px-24"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Slides */}
-      <div
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {images.map((item, index) => (
-          <div key={index} className="w-full flex-shrink-0 relative">
+      <div className="relative w-full h-[280px] sm:h-[400px] md:h-[500px] lg:h-[600px]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.8 }}
+            className="absolute inset-0 rounded-3xl shadow-2xl overflow-hidden"
+          >
             <img
-              src={item.url}
-              alt={`slide-${index}`}
-              className="w-full h-[250px] sm:h-[400px] md:h-[500px] lg:h-[600px] object-cover"
+              src={images[currentIndex].url}
+              alt={`slide-${currentIndex}`}
+              className="w-full h-full object-cover rounded-3xl"
             />
-
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-black/30 flex flex-col justify-center items-center text-white text-center px-4">
-              <h2 className="text-lg sm:text-2xl md:text-4xl lg:text-5xl font-bold mb-2">
-                {item.title}
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 mb-4">
-                {item.desc}
-              </p>
-              <button className="bg-yellow-400 text-black px-4 sm:px-6 py-2 rounded-full font-semibold hover:scale-105 transition text-sm sm:text-base">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent rounded-3xl" />
+            <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6 md:px-12 text-white">
+              <motion.h2
+                key={images[currentIndex].title}
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8 }}
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold drop-shadow-lg"
+              >
+                {images[currentIndex].title}
+              </motion.h2>
+              <motion.p
+                key={images[currentIndex].desc}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-sm sm:text-base md:text-lg lg:text-xl opacity-90 drop-shadow-md mb-4"
+              >
+                {images[currentIndex].desc}
+              </motion.p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-yellow-400 text-black px-5 py-2 sm:px-6 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-lg hover:shadow-xl transition-all"
+              >
                 Explore More
-              </button>
+              </motion.button>
             </div>
-          </div>
-        ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* Left & Right Arrows */}
+      {/* Arrows */}
       <button
         onClick={() =>
           setCurrentIndex((prev) => (prev - 1 + images.length) % images.length)
         }
-        className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 sm:p-3 rounded-full transition opacity-80 sm:opacity-100 text-lg sm:text-2xl z-20"
+        className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full z-20 text-lg sm:text-2xl transition"
       >
         &#8592;
       </button>
       <button
-        onClick={() => setCurrentIndex((prev) => (prev + 1) % images.length)}
-        className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/80 text-white p-2 sm:p-3 rounded-full transition opacity-80 sm:opacity-100 text-lg sm:text-2xl z-20"
+        onClick={() =>
+          setCurrentIndex((prev) => (prev + 1) % images.length)
+        }
+        className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/70 text-white p-2 sm:p-3 rounded-full z-20 text-lg sm:text-2xl transition"
       >
         &#8594;
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-3 z-20">
         {images.map((_, i) => (
           <div
             key={i}
             onClick={() => setCurrentIndex(i)}
-            className={`h-2 sm:h-3 w-2 sm:w-3 rounded-full cursor-pointer transition ${
-              currentIndex === i ? "bg-white scale-125" : "bg-white/50"
+            className={`h-3 w-3 sm:h-4 sm:w-4 rounded-full cursor-pointer transition-all ${
+              currentIndex === i ? "bg-white scale-125 shadow-lg" : "bg-white/50"
             }`}
           />
         ))}
@@ -118,4 +138,4 @@ const FlipkartBanner = () => {
   );
 };
 
-export default FlipkartBanner;
+export default ServiceBanner;

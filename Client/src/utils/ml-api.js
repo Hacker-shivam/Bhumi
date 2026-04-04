@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const MLAPI = axios.create({
-  baseURL: "http://192.168.1.9:10000",
+  baseURL: "https://bhumi-uxf6.onrender.com",
 });
 
 // Crop Prediction
