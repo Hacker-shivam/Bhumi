@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { loginUser } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = () => {
 
@@ -90,9 +90,9 @@ const Login = () => {
             <span className="text-gray-500">
               Don't have an account? 
             </span>
-            <a href="/signup" className="text-green-600 font-medium hover:underline ml-1">
+           <Link to="/signup" className="text-green-600 font-medium hover:underline ml-1">
               Sign Up
-            </a>
+            </Link>
           </div>
 
         </form>
